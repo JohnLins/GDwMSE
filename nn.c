@@ -76,8 +76,8 @@ int main()
     float test1[3] = {1, 0, 0};
     float test2[3] = {0, 1, 0};
 
-    printf("Result (1): %f", forward(w, test1));
-    printf("Result (0): %f", forward(w, test2));
+    printf("Result (1): %f \n", forward(w, test1));
+    printf("Result (0): %f \n", forward(w, test2));
 
 
     return 0;
