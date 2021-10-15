@@ -60,7 +60,7 @@ int main()
    printf("%f", forward(w, t_x[0]));
 
    //train
-    int iterations = 100;
+    int iterations = 10000;
     float learning_rate = .01;
     for(int i = 0; i < iterations; i++){
 
@@ -73,6 +73,11 @@ int main()
     }
 
 
+    float test1[3] = {1, 0, 0};
+    float test2[3] = {0, 1, 0};
+
+    printf("Result (1): %f", forward(w, test1));
+    printf("Result (0): %f", forward(w, test2));
 
 
     return 0;
