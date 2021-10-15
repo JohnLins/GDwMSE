@@ -6,7 +6,7 @@
 
 
 float sigmoid(float v){
-    return 1/(1+pow(e,-v));
+    return 1/(1+powf(e,-v));
 }
 
 float sigmoid_d(float v){
@@ -25,17 +25,27 @@ float forward(float w[3], float x[3]){
     return sigmoid(dot(w, x));
 }
 
-float loss_partial(int r, float w[3], float t_x[3][n], float t_y[n]){
+float loss_partial(int r, float w[3], float t_x[n][3], float t_y[n]){
     float p = 0;
-    for(int i = 0; i < 3; i++){
+    for(int i = 0; i < n; i++){
         float t = forward(w, t_x[i]);
         p += 2 * (sigmoid(t) - t_y[i]) *  sigmoid_d(t) *  t_x[i][r];      
 
     }
 
-    return p / 3;
+    return p / n;
 }
 
+float MSE(float w[3], float t_x[n][3], float t_y[n]){
+
+    float out = 0;
+    for(int i = 0; i < n; i++){
+        out += powf((forward(w, t_x[i]) - t_y[i]), 2);
+    }
+
+    return out / n;
+
+}
 
 
 int main()
@@ -58,7 +68,11 @@ int main()
             w[j] = w[j] - learning_rate * loss_partial(j, w, t_x, t_y);
         }
 
+        printf("loss: %f \n", MSE(w, t_x, t_y));
+
     }
+
+
 
 
     return 0;
