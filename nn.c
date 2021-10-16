@@ -33,7 +33,7 @@ float forward(float w[l], float x[l]){
 float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n], float (*s)(), float (*f)()){
     float p = 0;
     for(int i = 0; i < n; i++){
-        float t = forward(w, t_x[i]);
+        float t = dot(w, t_x[i]);
         p += 2 * (sigmoid(t) - t_y[i]) *  sigmoid_d(t) *  t_x[i][r];      
 
     }
@@ -81,7 +81,7 @@ int main()
     float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0}};
     float t_y[n] = {1, 1, 0};
    
-    int iterations = 10000;
+    int iterations = 50000;
     float learning_rate = .01;
     
     train(&iterations, &learning_rate, &loss_partial, &forward, w, t_x, t_y);
@@ -89,10 +89,11 @@ int main()
 
     float test1[3] = {1, 0, 0};
     float test2[3] = {0, 1, 0};
+    float test3[3] = {1, 0, 1};
 
     printf("Result (1): %f \n", forward(w, test1));
     printf("Result (0): %f \n", forward(w, test2));
-
+    printf("Result (1): %f \n", forward(w, test3));
 
     return 0;
 }
