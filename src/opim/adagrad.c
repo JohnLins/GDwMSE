@@ -62,7 +62,7 @@ float MSE(float w[l], float t_x[n][l], float t_y[n], float (*f)()){
 
 }
 
-void train(int *iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
+void train(int iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
 
 
 
@@ -70,7 +70,7 @@ double small = 0.000000001;
 float s[l];
 
 
-    for(int i = 0; i < *iterations; i++){
+    for(int i = 0; i < iterations; i++){
 
         for(int j = 0; j < 3; j++){
             
@@ -137,7 +137,7 @@ int main()
     int iterations = 1000;
     float learning_rate = .01;
     
-    train(&iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);
+    train(iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);
 
 
     float test1[3] = {1, 0, 0};
