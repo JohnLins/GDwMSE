@@ -40,7 +40,7 @@ float forward(float w[l], float x[l]){
     return sigmoid(dot(w, x));
 }
 
-float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n], float (*s)(), float (*f)()){
+float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n], float (*s)()){
     float p = 0;
     for(int i = 0; i < n; i++){
         float t = dot(w, t_x[i]);
@@ -62,11 +62,12 @@ float MSE(float w[l], float t_x[n][l], float t_y[n], float (*f)()){
 
 }
 
-void train(int *iterations, float *lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
+void train(int *iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
 
 
 
 double small = 0.000000001;
+float decay_rate = .9;
 float s[l];
 
 
@@ -74,11 +75,10 @@ float s[l];
 
         for(int j = 0; j < 3; j++){
             
-            float gradient_j = (*lp)(j, w, t_x, t_y, f); 
-            s[j] += pow(gradient_j,2);
-            //s += pow(gradient_j,2);
+            float gradient_j = (*lp)(j, w, t_x, t_y); 
+            s[j] = decay_rate * s[j] + (1-decay_rate) * pow(gradient_j,2);
 
-            w[j] = w[j] - ((*lr)/sqrt(s[j] + small)) * gradient_j;
+            w[j] = w[j] - ((lr)/sqrt(s[j] + small)) * gradient_j;
         }
 
         printf("loss: %f \n", MSE(w, t_x, t_y, f));
@@ -86,37 +86,6 @@ float s[l];
     }
 
 }
-
-
-
-//THIS WORKS EXTREMELY WELL, but I think it's just becuase it had a larger learning rate in gernal
-/*
-void train(int *iterations, float *lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
-
-
-
-double small = 0.000000001;
-//float s[l];
-
-
-    for(int i = 0; i < *iterations; i++){
-
-        //sum of squared gradients from past weights
-        float s = 0;
-
-        for(int j = 0; j < 3; j++){
-            
-            float gradient_j = (*lp)(j, w, t_x, t_y, f); 
-            s += pow(gradient_j,2);
-
-            w[j] = w[j] - ((*lr)/sqrt(s + small)) * gradient_j;
-        }
-
-        printf("loss: %f \n", MSE(w, t_x, t_y, f));
-
-    }
-
-}*/
 
 
 
@@ -138,7 +107,7 @@ int main()
     int iterations = 1000;
     float learning_rate = .01;
     
-    train(&iterations, &learning_rate, &loss_partial, &forward, w, t_x, t_y);
+    train(&iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);
 
 
     float test1[3] = {1, 0, 0};

@@ -3,11 +3,9 @@
 #include <time.h>
 #include <stdlib.h>
 
+#include "macros.h"
 
 
-#define e 2.71
-#define n 3
-#define l 3
 
 
 float sigmoid(float v){
@@ -30,7 +28,7 @@ float forward(float w[l], float x[l]){
     return sigmoid(dot(w, x));
 }
 
-float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n], float (*s)(), float (*f)()){
+float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n]){
     float p = 0;
     for(int i = 0; i < n; i++){
         float t = dot(w, t_x[i]);
@@ -52,12 +50,12 @@ float MSE(float w[l], float t_x[n][l], float t_y[n], float (*f)()){
 
 }
 
-void train(int *iterations, float *lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
+void train(int *iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
 
     for(int i = 0; i < *iterations; i++){
 
         for(int j = 0; j < 3; j++){
-            w[j] = w[j] - (*lr) * (*lp)(j, w, t_x, t_y, f);
+            w[j] = w[j] - (lr) * (*lp)(j, w, t_x, t_y);
         }
 
         printf("loss: %f \n", MSE(w, t_x, t_y, f));
@@ -81,10 +79,10 @@ int main()
     float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0}};
     float t_y[n] = {1, 1, 0};
    
-    int iterations = 500;
+    int iterations = 5000;
     float learning_rate = .01;
     
-    train(&iterations, &learning_rate, &loss_partial, &forward, w, t_x, t_y);
+    train(&iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);
 
 
     float test1[3] = {1, 0, 0};
