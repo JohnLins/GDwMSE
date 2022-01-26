@@ -3,7 +3,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "macros.h"
+#include "../../macros.h"
 
 
 
@@ -52,10 +52,22 @@ float MSE(float w[l], float t_x[n][l], float t_y[n], float (*f)()){
 
 void train(int iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
 
+
+    float small = 0.001;
+    float s[l];
+    float last_gradient[l];
+
     for(int i = 0; i < iterations; i++){
 
         for(int j = 0; j < 3; j++){
-            w[j] = w[j] - (lr) * (*lp)(j, w, t_x, t_y);
+            float gradient_j = (*lp)(j, w, t_x, t_y);
+            
+            s[j] *= fabs(last_gradient[j]) / (fabs(gradient_j) + small);
+            printf("%f \n", s[j]);
+            //s[j] *= fabs(gradient_j) / (fabs(last_gradient[j]) + small);
+            w[j] = w[j] - (lr) * gradient_j * s[j];
+            
+            last_gradient[j] = gradient_j;
         }
 
         printf("loss: %f \n", MSE(w, t_x, t_y, f));
@@ -79,7 +91,7 @@ int main()
     float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0}, {1, 1, 1}, {0, 0, 0}, {0, 0, 1}};
     float t_y[n] = {1, 1, 0, 1, 0, 0};
    
-    int iterations = 4000;
+    int iterations = 40;
     float learning_rate = .01;
     
     train(iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);

@@ -1,11 +1,22 @@
+/*
+avgada 
+Averages the learning rate for all weights (more efficient and adds noise)
+
+WORKS
+*/
+
+
+
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
 #include <stdlib.h>
 
-#include "macros.h"
 
 
+#define e 2.71
+#define n 3
+#define l 3
 
 
 float sigmoid(float v){
@@ -28,7 +39,7 @@ float forward(float w[l], float x[l]){
     return sigmoid(dot(w, x));
 }
 
-float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n]){
+float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n], float (*s)()){
     float p = 0;
     for(int i = 0; i < n; i++){
         float t = dot(w, t_x[i]);
@@ -52,17 +63,37 @@ float MSE(float w[l], float t_x[n][l], float t_y[n], float (*f)()){
 
 void train(int iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
 
+
+
+double small = 0.000000001;
+float decay_rate = .9;
+float cashe = 0;
+
+
     for(int i = 0; i < iterations; i++){
 
         for(int j = 0; j < 3; j++){
-            w[j] = w[j] - (lr) * (*lp)(j, w, t_x, t_y);
+           
+           
+           
+            float gradient_j = (*lp)(j, w, t_x, t_y);
+            cashe += pow(gradient_j,2);
+           
+            //s[j] = decay_rate * s[j] + (1-decay_rate) * pow(gradient_j,2);
+
+                //3 = len(w)
+            w[j] = w[j] - ((lr)/sqrt((  cashe/3  ) + small)) * gradient_j;
+
+            
         }
 
-        printf("loss: %f \n", MSE(w, t_x, t_y, f));
+        printf("loss: %f , l: %f\n", MSE(w, t_x, t_y, f), ((lr)/sqrt((  cashe/3  ) + small)));
 
     }
 
 }
+
+
 
 
 int main()
@@ -76,12 +107,12 @@ int main()
         w[i] = 1.0 * rand() / (RAND_MAX / 2) - 1;
     }
    
-    float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0}, {1, 1, 1}, {0, 0, 0}, {0, 0, 1}};
-    float t_y[n] = {1, 1, 0, 1, 0, 0};
+    float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0}};
+    float t_y[n] = {1, 1, 0};
    
-    int iterations = 4000;
+    int iterations = 100;
     float learning_rate = .01;
-    
+   
     train(iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);
 
 

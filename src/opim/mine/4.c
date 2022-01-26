@@ -3,9 +3,12 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "macros.h"
+#include "../../macros.h"
 
+/*
+WORKS PRETTY WELL
 
+*/
 
 
 float sigmoid(float v){
@@ -28,7 +31,8 @@ float forward(float w[l], float x[l]){
     return sigmoid(dot(w, x));
 }
 
-float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n]){
+float loss_partial(int r, float w[l], float t_x[n][l], float t_y[n], float delta_w){
+    w[r] += delta_w;
     float p = 0;
     for(int i = 0; i < n; i++){
         float t = dot(w, t_x[i]);
@@ -50,12 +54,23 @@ float MSE(float w[l], float t_x[n][l], float t_y[n], float (*f)()){
 
 }
 
-void train(int iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
+void train(int iterations, float lr, float (*lp)(int r, float w[l], float t_x[n][l], float t_y[n], float delta_w), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
+
+
+    float small = 0.001;
 
     for(int i = 0; i < iterations; i++){
 
         for(int j = 0; j < 3; j++){
-            w[j] = w[j] - (lr) * (*lp)(j, w, t_x, t_y);
+            float gradient_j = (*lp)(j, w, t_x, t_y, 0);
+            
+            float thing = ((*lp)(j, w, t_x, t_y, small) - gradient_j) / small;
+            
+            printf("thing: %f \n", gradient_j, thing);
+            w[j] = w[j] - (lr + thing) * gradient_j;
+            //w[j] = w[j] - (lr) * gradient_j * thing;
+            
+           
         }
 
         printf("loss: %f \n", MSE(w, t_x, t_y, f));
@@ -79,7 +94,7 @@ int main()
     float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0}, {1, 1, 1}, {0, 0, 0}, {0, 0, 1}};
     float t_y[n] = {1, 1, 0, 1, 0, 0};
    
-    int iterations = 4000;
+    int iterations = 2000;
     float learning_rate = .01;
     
     train(iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);

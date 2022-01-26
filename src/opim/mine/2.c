@@ -3,9 +3,13 @@
 #include <time.h>
 #include <stdlib.h>
 
-#include "macros.h"
+#include "../../macros.h"
 
+/*
 
+WORKS PRETTY WELL
+
+*/
 
 
 float sigmoid(float v){
@@ -52,10 +56,21 @@ float MSE(float w[l], float t_x[n][l], float t_y[n], float (*f)()){
 
 void train(int iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
 
+
+    double small = 0.0001;
+    float s[l];
+    //float last_gradient[l];
+
     for(int i = 0; i < iterations; i++){
 
         for(int j = 0; j < 3; j++){
-            w[j] = w[j] - (lr) * (*lp)(j, w, t_x, t_y);
+            float gradient_j = (*lp)(j, w, t_x, t_y);
+
+           // s[j] = s[j] / (fabs(gradient_j) + small);
+             s[j] = fabs(gradient_j) / (fabs(s[j]) + small);
+            printf("%f \n", s[j]);
+
+            w[j] = w[j] - (lr) * gradient_j * s[j];
         }
 
         printf("loss: %f \n", MSE(w, t_x, t_y, f));
