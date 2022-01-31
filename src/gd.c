@@ -54,7 +54,7 @@ void train(int iterations, float lr, float (*lp)(), float (*f)(), float w[l], fl
 
     for(int i = 0; i < iterations; i++){
 
-        for(int j = 0; j < 3; j++){
+        for(int j = 0; j < l; j++){
             w[j] = w[j] - (lr) * (*lp)(j, w, t_x, t_y);
         }
 

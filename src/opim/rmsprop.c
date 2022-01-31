@@ -3,7 +3,7 @@ Adagrad
 
 This gives every parameter a different learning rate
 
-
+DONE
 */
 
 
@@ -62,21 +62,20 @@ float MSE(float w[l], float t_x[n][l], float t_y[n], float (*f)()){
 
 void train(int iterations, float lr, float (*lp)(), float (*f)(), float w[l], float t_x[n][l], float t_y[n]){
 
-
-
 double small = 0.000000001;
 float decay_rate = .9;
 float cashe[l];
+for(int i = 0; i < l; i++){cashe[i] = 0;}
 
 
     for(int i = 0; i < iterations; i++){
 
-        for(int j = 0; j < 3; j++){
+        for(int j = 0; j < l; j++){
             
             float gradient_j = (*lp)(j, w, t_x, t_y); 
             cashe[j] = decay_rate * cashe[j] + (1-decay_rate) * pow(gradient_j,2);
 
-            w[j] = w[j] - ((lr)/sqrt(cashe[j] + small)) * gradient_j;
+            w[j] = w[j] - ((lr)/(sqrt(cashe[j]) + small)) * gradient_j;
         }
 
         printf("loss: %f , l for w_0: %f \n", MSE(w, t_x, t_y, f), ((lr)/sqrt(cashe[0] + small)));
@@ -102,7 +101,7 @@ int main()
     float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0}, {1, 1, 1}, {0, 0, 0}, {0, 0, 1}};
     float t_y[n] = {1, 1, 0, 1, 0, 0};
    
-    int iterations = 100;
+    int iterations = 1000;
     float learning_rate = .01;
     
     train(iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);

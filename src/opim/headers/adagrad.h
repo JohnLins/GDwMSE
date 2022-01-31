@@ -11,7 +11,7 @@ float s[l];
 
     for(int i = 0; i < iterations; i++){
 
-        for(int j = 0; j < 3; j++){
+        for(int j = 0; j < l; j++){
             
             float gradient_j = (*lp)(j, w, t_x, t_y); 
             s[j] += pow(gradient_j,2);
