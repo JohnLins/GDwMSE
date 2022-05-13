@@ -14,9 +14,7 @@ WORKS
 
 
 
-#define e 2.71
-#define n 3
-#define l 3
+#include "../../macros.h"
 
 
 float sigmoid(float v){
@@ -96,33 +94,45 @@ float cashe = 0;
 
 
 
+
 int main()
 {
 
     srand(time(0));
 
-    float w[l] = {.3, -.9, .1};
+    float w[l];
 
     for(int i = 0; i < l; i++){
         w[i] = 1.0 * rand() / (RAND_MAX / 2) - 1;
     }
    
-    float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0}};
-    float t_y[n] = {1, 1, 0};
+    float t_x[n][l] = {{1, 0.1, 0.1, 1, 0.1, 1, 1, 0.1}, //happy
+                        {1, 0.1, 0.1, 1, 1, 1, 1, 1},
+                        {1, 0.1, 0.1, 1, 0.1, 1, 1, 1},
+                        {1, 0.1, 0.1, 1, 1, 1, 1, 0.1},
+
+
+                        {0.1, 1, 1, 0.1, 1, 0.1, 0.1, 1}, //sad
+                        {1, 1, 1, 1, 1, 0.1, 0.1, 1},
+                        {0.1, 1, 1, 1, 1, 0.1, 0.1, 1},
+                        {1, 1, 1, 0.1, 1, 0.1, 0.1, 1}};
+
+
+
+    float t_y[n] = {1, 1, 1, 1, 0.1, 0.1, 0.1, 0.1};
    
-    int iterations = 100;
-    float learning_rate = .01;
-   
+    int iterations = 1000;
+   float learning_rate = .01;
+    
     train(iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);
 
 
-    float test1[3] = {1, 0, 0};
-    float test2[3] = {0, 1, 0};
-    float test3[3] = {1, 0, 1};
+    float test1[l] = {1, 0.1, 0.1, 1, 0.1, 1, 1, 0.1};
+    float test2[l] = {0.1, 1, 1, 1, 1, 0.1, 0.1, 1};
 
     printf("Result (1): %f \n", forward(w, test1));
     printf("Result (0): %f \n", forward(w, test2));
-    printf("Result (1): %f \n", forward(w, test3));
+
 
     return 0;
 }

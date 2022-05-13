@@ -65,8 +65,8 @@ void train(int iterations, float lr, float (*lp)(), float (*f)(), float w[l], fl
 
 
 float small = 0.000000001;
-float cashe[l];
-for(int i = 0; i < l; i++){cashe[i] = 0;}
+float cache[l];
+for(int i = 0; i < l; i++){cache[i] = 0;}
 
 
     for(int i = 0; i < iterations; i++){
@@ -74,12 +74,12 @@ for(int i = 0; i < l; i++){cashe[i] = 0;}
         for(int j = 0; j < l; j++){
             
             float gradient_j = (*lp)(j, w, t_x, t_y); 
-            cashe[j] += pow(gradient_j,2);
+            cache[j] += pow(gradient_j,2);
 
-            w[j] = w[j] - (lr/(sqrt(cashe[j]) + small)) * gradient_j;
+            w[j] = w[j] - (lr/(sqrt(cache[j]) + small)) * gradient_j;
         }
 
-        printf("loss: %f , l for w_0: %f \n", MSE(w, t_x, t_y, f), ((lr)/sqrt(cashe[0] + small)));
+        printf("loss: %f\n", MSE(w, t_x, t_y, f));
 
     }
 
@@ -119,33 +119,45 @@ double small = 0.000000001;
 
 
 
+
 int main()
 {
 
     srand(time(0));
 
-    float w[l] = {.3, -.9, .1};
+    float w[l];
 
     for(int i = 0; i < l; i++){
         w[i] = 1.0 * rand() / (RAND_MAX / 2) - 1;
     }
    
-    float t_x[n][l] = {{1, 0, 0},{1, 1, 0},{0, 1, 0},{1, 1, 1},{0, 0, 0},{0, 0, 1}};
-    float t_y[n] = {1, 1, 0, 1, 0, 0};
+    float t_x[n][l] = {{1, 0.1, 0.1, 1, 0.1, 1, 1, 0.1}, //happy
+                        {1, 0.1, 0.1, 1, 1, 1, 1, 1},
+                        {1, 0.1, 0.1, 1, 0.1, 1, 1, 1},
+                        {1, 0.1, 0.1, 1, 1, 1, 1, 0.1},
+
+
+                        {0.1, 1, 1, 0.1, 1, 0.1, 0.1, 1}, //sad
+                        {1, 1, 1, 1, 1, 0.1, 0.1, 1},
+                        {0.1, 1, 1, 1, 1, 0.1, 0.1, 1},
+                        {1, 1, 1, 0.1, 1, 0.1, 0.1, 1}};
+
+
+
+    float t_y[n] = {1, 1, 1, 1, 0.1, 0.1, 0.1, 0.1};
    
-    int iterations = 100;
-    float learning_rate = .01;
+    int iterations = 1000;
+   float learning_rate = .01;
     
     train(iterations, learning_rate, &loss_partial, &forward, w, t_x, t_y);
 
 
-    float test1[3] = {1, 0, 0};
-    float test2[3] = {0, 1, 0};
-    float test3[3] = {1, 0, 1};
+    float test1[l] = {1, 0.1, 0.1, 1, 0.1, 1, 1, 0.1};
+    float test2[l] = {0.1, 1, 1, 1, 1, 0.1, 0.1, 1};
 
     printf("Result (1): %f \n", forward(w, test1));
     printf("Result (0): %f \n", forward(w, test2));
-    printf("Result (1): %f \n", forward(w, test3));
+
 
     return 0;
 }
